@@ -1,0 +1,19 @@
+{
+  "name": "universal-ai",
+  "version": "1.0.0",
+  "description": "Hybrid on-device + cloud AI study helper built with Firebase AI Logic",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "firebase": "^13.3.0"
+  },
+  "devDependencies": {
+    "vite": "^8.3.8"
+  },
+  "type": "module",
+  "private": true
+}

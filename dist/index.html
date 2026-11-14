@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Universal AI — study help that works on slow internet</title>
+    <meta name="description" content="A hybrid AI study helper: on-device Gemini Nano when the network is slow or offline, cloud Gemini when it is fast." />
+    <script type="module" crossorigin src="/assets/index-BNNVC7R5.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CEC4sveq.css">
+  </head>
+  <body>
+    <header class="top">
+      <div class="brand">
+        <span class="logo">U</span>
+        <div>
+          <h1>Universal AI</h1>
+          <p class="tag">Study help that keeps working on slow internet</p>
+        </div>
+      </div>
+      <div class="status" id="status">
+        <span class="chip" id="netChip">Checking network…</span>
+        <span class="chip" id="deviceChip">Checking offline AI…</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="card controls">
+        <div class="row">
+          <label for="routing">AI routing</label>
+          <select id="routing">
+            <option value="auto" selected>Smart (network-aware)</option>
+            <option value="prefer_on_device">Prefer on-device</option>
+            <option value="prefer_in_cloud">Prefer cloud</option>
+            <option value="only_on_device">Only on-device</option>
+            <option value="only_in_cloud">Only cloud</option>
+          </select>
+          <span class="hint" id="routeHint"></span>
+        </div>
+        <button class="secondary" id="downloadBtn">⬇️ Download offline AI</button>
+        <div class="progress hidden" id="progressWrap"><div id="progressBar"></div></div>
+      </section>
+
+      <section class="card">
+        <div class="tasks" role="tablist">
+          <button class="task active" data-task="ask">💬 Ask a doubt</button>
+          <button class="task" data-task="explain">🧒 Explain simply</button>
+          <button class="task" data-task="summary">📝 Summarize notes</button>
+          <button class="task" data-task="quiz">❓ Quiz me</button>
+        </div>
+        <textarea id="input" rows="6" placeholder="Type your question, e.g. What is photosynthesis?"></textarea>
+        <div class="row">
+          <button id="sendBtn">Get answer</button>
+          <span class="hint">Tip: use DevTools → Network → “Slow 3G” or “Offline” to watch it switch.</span>
+        </div>
+      </section>
+
+      <section id="answers"></section>
+    </main>
+
+    <footer>
+      Built with Firebase AI Logic hybrid inference · Gemini Nano on-device + Gemini in the cloud · MIT licensed
+    </footer>
+
+  </body>
+</html>
