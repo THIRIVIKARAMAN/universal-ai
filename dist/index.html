@@ -2,64 +2,260 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Universal AI — study help that works on slow internet</title>
-    <meta name="description" content="A hybrid AI study helper: on-device Gemini Nano when the network is slow or offline, cloud Gemini when it is fast." />
-    <script type="module" crossorigin src="/assets/index-BNNVC7R5.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-CEC4sveq.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Universal AI — study help on any signal</title>
+    <meta name="description" content="A hybrid AI study helper: Gemini Nano on your device when the signal is weak or gone, Gemini in the cloud when it's strong." />
+    <meta name="theme-color" content="#15213B" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Anek+Latin:wdth,wght@75..125,400..800&family=Mukta:wght@400;500;700&display=swap" rel="stylesheet" />
+    <script type="module" crossorigin src="/assets/index-CQh3tAWU.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-S3AXHsIn.css">
   </head>
   <body>
-    <header class="top">
-      <div class="brand">
-        <span class="logo">U</span>
-        <div>
-          <h1>Universal AI</h1>
-          <p class="tag">Study help that keeps working on slow internet</p>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <linearGradient id="logoBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22336a" /><stop offset="1" stop-color="#0d142b" /></linearGradient>
+        <linearGradient id="logoU" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3fd6a2" /><stop offset="1" stop-color="#7fa6ff" /></linearGradient>
+      </defs>
+      <symbol id="logo" viewBox="0 0 48 48">
+        <rect width="48" height="48" rx="14" fill="url(#logoBg)" />
+        <path d="M13.5 11 V24.5 A10.5 10.5 0 0 0 34.5 24.5 V11" fill="none" stroke="url(#logoU)" stroke-width="6" stroke-linecap="round" />
+        <path d="M24 35 V21" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".92" />
+        <circle cx="24" cy="17.5" r="3.2" fill="#fff" />
+      </symbol>
+    </svg>
+
+    <div class="app" id="app">
+      <aside class="sidebar" id="sidebar" aria-label="Chats and tools">
+        <div class="side-top">
+          <div class="brand">
+            <svg class="mark"><use href="#logo" /></svg>
+            <span class="wordmark">Universal AI</span>
+          </div>
+          <button class="icon-only close-side" id="closeSide" type="button" aria-label="Close menu">
+            <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" /></svg>
+          </button>
         </div>
+
+        <button class="new-chat" id="newChatBtn" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+          New chat
+        </button>
+
+        <nav class="side-nav" aria-label="Tools">
+          <button class="nav-item" data-view="schedule" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3" /><path d="M8 3v4M16 3v4M4 10h16" /></svg>
+            Schedule <span class="count" id="schedCount" hidden></span>
+          </button>
+          <button class="nav-item" data-view="photo" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l2-2.5h6L17 7h3v12H4z" /><circle cx="12" cy="13" r="3.6" /></svg>
+            Photo cleaner
+          </button>
+          <button class="nav-item" data-view="way" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11A6.5 6.5 0 0 1 18.5 10c0 4.8-6.5 11-6.5 11z" /><circle cx="12" cy="10" r="2.4" /></svg>
+            Find my way back
+          </button>
+        </nav>
+
+        <div class="side-group">
+          <div class="side-head">
+            <span>Projects</span>
+            <button class="icon-only" id="addProjectBtn" type="button" aria-label="New project">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
+            </button>
+          </div>
+          <form class="inline-form" id="projectForm" hidden>
+            <input id="projectName" maxlength="40" placeholder="Subject, e.g. Physics" aria-label="Project name" />
+            <button class="link-btn" type="submit">Add</button>
+          </form>
+          <ul class="side-list" id="projectList"></ul>
+        </div>
+
+        <div class="side-group grow">
+          <div class="side-head"><span id="chatsHead">Recent chats</span></div>
+          <ul class="side-list" id="chatList"></ul>
+        </div>
+
+        <p class="side-foot">Created by Thirivikaraman. Chats are saved only on this device.</p>
+      </aside>
+      <div class="scrim" id="scrim" hidden></div>
+
+      <div class="main">
+        <header class="topbar">
+          <button class="icon-only open-side" id="openSide" type="button" aria-label="Open menu">
+            <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+          </button>
+          <div class="top-title">
+            <span id="viewTitle">New chat</span>
+            <select id="chatProject" aria-label="Project for this chat" hidden></select>
+          </div>
+          <div class="top-right">
+            <button class="chip-btn" id="installBtn" type="button" hidden>Install app</button>
+            <p class="signal" id="netChip" aria-live="polite">Checking signal</p>
+          </div>
+        </header>
+
+        <!-- Chat view -->
+        <section class="view view-chat" id="view-chat">
+          <div class="scroller" id="chatScroller">
+            <div class="welcome" id="welcome">
+              <svg class="welcome-mark"><use href="#logo" /></svg>
+              <h1>What are we studying today?</h1>
+              <div class="track-wrap" id="trackWrap" data-route="cloud">
+                <svg class="track" viewBox="0 0 360 132" role="img" aria-labelledby="trackDesc">
+                  <desc id="trackDesc">Your question goes either to the AI on this device or to the AI in the cloud.</desc>
+                  <path class="rail rail-device" id="pathDevice" d="M12 66 H118 C150 66 158 30 194 30 H344" />
+                  <path class="rail rail-cloud" id="pathCloud" d="M12 66 H118 C150 66 158 102 194 102 H344" />
+                  <circle class="origin" cx="12" cy="66" r="6" />
+                  <circle class="train train-device" r="7">
+                    <animateMotion id="runDevice" begin="indefinite" dur="0.9s" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1"><mpath href="#pathDevice" /></animateMotion>
+                  </circle>
+                  <circle class="train train-cloud" r="7">
+                    <animateMotion id="runCloud" begin="indefinite" dur="0.9s" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1"><mpath href="#pathCloud" /></animateMotion>
+                  </circle>
+                </svg>
+                <div class="stations">
+                  <div class="station station-device">
+                    <strong>On this device</strong>
+                    <span id="deviceChip">Checking Gemini Nano</span>
+                    <button class="link-btn" id="downloadBtn" type="button" hidden>Download offline AI</button>
+                    <div class="progress" id="progressWrap" hidden><div id="progressBar"></div></div>
+                  </div>
+                  <div class="station station-cloud">
+                    <strong>Cloud</strong>
+                    <span>Gemini, best for long answers</span>
+                  </div>
+                </div>
+              </div>
+              <p class="why" id="routeHint" aria-live="polite"></p>
+            </div>
+            <div class="thread" id="thread" aria-live="polite"></div>
+          </div>
+
+          <div class="composer">
+            <div class="attachment" id="attachment" hidden>
+              <img id="attachThumb" alt="Attached photo" />
+              <span id="attachNote">Photo attached</span>
+              <button class="link-btn" id="attachEnhance" type="button">Make it easier to read</button>
+              <button class="link-btn" id="attachRemove" type="button">Remove</button>
+            </div>
+            <div class="box">
+              <label class="sr-only" for="input">Your question</label>
+              <textarea id="input" rows="1" placeholder="Ask a doubt, paste notes, or ask a follow-up"></textarea>
+              <div class="box-row">
+                <div class="box-tools">
+                  <button class="icon-btn" id="photoBtn" type="button" aria-label="Add a photo">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l2-2.5h6L17 7h3v12H4z" /><circle cx="12" cy="13" r="3.6" /></svg>
+                  </button>
+                  <button class="icon-btn" id="micBtn" type="button" aria-label="Speak your question" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" /></svg>
+                  </button>
+                  <select id="task" aria-label="What do you need?">
+                    <option value="ask">Ask a doubt</option>
+                    <option value="explain">Explain simply</option>
+                    <option value="summary">Summarize notes</option>
+                    <option value="quiz">Quiz me</option>
+                  </select>
+                  <select id="routing" aria-label="Where the AI runs">
+                    <option value="auto" selected>Route by signal</option>
+                    <option value="prefer_on_device">Device first</option>
+                    <option value="prefer_in_cloud">Cloud first</option>
+                    <option value="only_on_device">Device only</option>
+                    <option value="only_in_cloud">Cloud only</option>
+                  </select>
+                </div>
+                <button class="send" id="sendBtn" type="button" aria-label="Send">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" /></svg>
+                </button>
+              </div>
+            </div>
+            <p class="hint" id="composerHint">Enter sends, Shift + Enter adds a new line.</p>
+            <input type="file" id="photoInput" accept="image/*" hidden />
+          </div>
+        </section>
+
+        <!-- Schedule view -->
+        <section class="view view-page" id="view-schedule" hidden>
+          <div class="page">
+            <h1>Study schedule</h1>
+            <p class="lead">Plan your study sessions. While the app is open, you'll get a reminder when each one starts.</p>
+            <form class="sched-form" id="schedForm">
+              <label class="wide"><span>What to study</span><input id="schedTitle" required maxlength="80" placeholder="Revise chapter 3, Laws of Motion" /></label>
+              <label><span>Date</span><input id="schedDate" type="date" required /></label>
+              <label><span>Time</span><input id="schedTime" type="time" required /></label>
+              <label><span>Project</span><select id="schedProject"></select></label>
+              <button class="primary" type="submit">Add to schedule</button>
+            </form>
+            <button class="link-btn" id="planBtn" type="button">Ask the AI to make a study plan</button>
+            <h2>Coming up</h2>
+            <ul class="sched-list" id="schedUpcoming"></ul>
+            <p class="empty" id="schedEmpty">Nothing planned yet.</p>
+            <h2 id="schedDoneHead" hidden>Done</h2>
+            <ul class="sched-list done" id="schedDone"></ul>
+          </div>
+        </section>
+
+        <!-- Photo cleaner view -->
+        <section class="view view-page" id="view-photo" hidden>
+          <div class="page">
+            <h1>Photo cleaner</h1>
+            <p class="lead">Turn a dim, blurry photo of notes or a textbook page into a clear, readable scan. It runs on this device, with or without internet.</p>
+            <div class="enhance-controls">
+              <button class="primary" id="enhPick" type="button">Choose a photo</button>
+              <label><span>Style</span>
+                <select id="enhMode">
+                  <option value="scan" selected>Scanned page (black and white)</option>
+                  <option value="color">Brighter colour</option>
+                  <option value="original">Original</option>
+                </select>
+              </label>
+              <label><span>Strength</span><input type="range" id="enhStrength" min="0" max="100" value="60" /></label>
+            </div>
+            <div class="enhance-stage" id="enhStage" hidden>
+              <figure><canvas id="enhBefore"></canvas><figcaption>Before</figcaption></figure>
+              <figure><canvas id="enhAfter"></canvas><figcaption>After</figcaption></figure>
+            </div>
+            <div class="tool-actions" id="enhActions" hidden>
+              <button class="primary" id="enhAsk" type="button">Ask the AI about this photo</button>
+              <button class="secondary" id="enhSave" type="button">Save photo</button>
+            </div>
+            <input type="file" id="enhInput" accept="image/*" hidden />
+          </div>
+        </section>
+
+        <!-- Way back view -->
+        <section class="view view-page" id="view-way" hidden>
+          <div class="page">
+            <h1>Find my way back</h1>
+            <p class="lead">Save a place like home or your hostel. With signal you get a map; without signal, a compass arrow and the distance. Works best on a phone with GPS.</p>
+            <div class="tool-actions">
+              <button class="secondary" id="saveHomeBtn" type="button">Save where I am now</button>
+              <button class="primary" id="guideBtn" type="button">Show me the way</button>
+            </div>
+            <p class="tool-status" id="wayStatus">No place saved yet. Save your home while you're there.</p>
+            <div class="compass" id="compass" hidden>
+              <div class="dial" aria-hidden="true">
+                <span class="north">N</span>
+                <svg class="needle" id="needle" viewBox="0 0 100 100"><path d="M50 8 L64 58 L50 50 L36 58 Z" /></svg>
+              </div>
+              <div class="compass-read">
+                <strong id="wayDistance">–</strong>
+                <span id="wayDirection"></span>
+              </div>
+            </div>
+            <div class="map-wrap" id="mapWrap" hidden>
+              <iframe id="mapFrame" title="Map to your saved place" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+              <a class="link-btn" id="mapLink" target="_blank" rel="noopener">Open walking directions in Google Maps</a>
+            </div>
+            <button class="link-btn" id="safetyBtn" type="button">Ask the AI what to do if I'm lost</button>
+          </div>
+        </section>
       </div>
-      <div class="status" id="status">
-        <span class="chip" id="netChip">Checking network…</span>
-        <span class="chip" id="deviceChip">Checking offline AI…</span>
-      </div>
-    </header>
-
-    <main>
-      <section class="card controls">
-        <div class="row">
-          <label for="routing">AI routing</label>
-          <select id="routing">
-            <option value="auto" selected>Smart (network-aware)</option>
-            <option value="prefer_on_device">Prefer on-device</option>
-            <option value="prefer_in_cloud">Prefer cloud</option>
-            <option value="only_on_device">Only on-device</option>
-            <option value="only_in_cloud">Only cloud</option>
-          </select>
-          <span class="hint" id="routeHint"></span>
-        </div>
-        <button class="secondary" id="downloadBtn">⬇️ Download offline AI</button>
-        <div class="progress hidden" id="progressWrap"><div id="progressBar"></div></div>
-      </section>
-
-      <section class="card">
-        <div class="tasks" role="tablist">
-          <button class="task active" data-task="ask">💬 Ask a doubt</button>
-          <button class="task" data-task="explain">🧒 Explain simply</button>
-          <button class="task" data-task="summary">📝 Summarize notes</button>
-          <button class="task" data-task="quiz">❓ Quiz me</button>
-        </div>
-        <textarea id="input" rows="6" placeholder="Type your question, e.g. What is photosynthesis?"></textarea>
-        <div class="row">
-          <button id="sendBtn">Get answer</button>
-          <span class="hint">Tip: use DevTools → Network → “Slow 3G” or “Offline” to watch it switch.</span>
-        </div>
-      </section>
-
-      <section id="answers"></section>
-    </main>
-
-    <footer>
-      Built with Firebase AI Logic hybrid inference · Gemini Nano on-device + Gemini in the cloud · MIT licensed
-    </footer>
+    </div>
 
   </body>
 </html>

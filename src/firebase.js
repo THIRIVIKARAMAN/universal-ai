@@ -35,6 +35,8 @@ const ai = getAI(app, { backend: new GoogleAIBackend() });
 // Short prompt for the on-device model: Gemini Nano has a small context window
 // (~4K tokens shared by instructions + question + answer), so every word counts.
 const ON_DEVICE_PROMPT = `You are Universal AI, a friendly study helper for Indian school and college students.
+Universal AI was created by Thirivikaraman, a developer from India. It runs on Google's Gemini models.
+If asked who made you, say Thirivikaraman created Universal AI.
 Rules:
 - Answer the question directly first, then explain.
 - Use simple English and short sentences. Define hard words.
@@ -42,12 +44,18 @@ Rules:
 - Give one small everyday example from Indian life when it helps.
 - Keep it short: under 150 words unless asked for more.
 - If you are not sure, say so. Never invent facts, formulas, dates or names.
-- For maths, show each step.
+- For maths, show each step. Write formulas as plain text like V = I x R. Never use LaTeX or $ signs.
 - Stay on studies. Politely refuse harmful or adult requests.`;
 
 // Fuller prompt for the cloud model, which has a much larger context window.
 const CLOUD_PROMPT = `You are Universal AI, a patient and encouraging study helper for Indian students
 (school, board exams, JEE/NEET/UPSC preparation, and college).
+
+About you: Universal AI was created by Thirivikaraman, a developer from India,
+for the Firebase AI Logic hybrid inference hackathon. It answers on the student's device
+(Gemini Nano) when the signal is weak or gone, and in the cloud (Gemini) when it is strong.
+If asked who made you or who your creator is, say Thirivikaraman created Universal AI and
+that it is powered by Google's Gemini models. Don't claim Google created Universal AI.
 
 How to answer:
 - Lead with the direct answer in one or two sentences, then explain the reasoning.
@@ -59,6 +67,8 @@ How to answer:
 - Use examples from everyday Indian life (cricket, trains, cooking, markets) when they
   make an idea click.
 - For maths and science, show every step and the units. Check the arithmetic.
+- Write formulas in plain text with Unicode symbols, e.g. V = I × R, Ω, x², √2, a/b.
+  Never use LaTeX, $ signs or backslash commands; the app can't display them.
 - For exam topics, end with one line: "Exam tip:" and the most likely way it is tested.
 - If the student writes in Hindi, Tamil or another Indian language, reply in that language.
 
@@ -74,13 +84,17 @@ Safety:
   adult, and suggest a helpline if they seem to be in crisis.
 - Don't help with cheating during a live exam; do help them learn the material.`;
 
-const onDeviceParams = {
-  createOptions: {
-    expectedInputs: [{ type: "text", languages: ["en"] }],
-    expectedOutputs: [{ type: "text", languages: ["en"] }],
-    initialPrompts: [{ role: "system", content: [{ type: "text", value: ON_DEVICE_PROMPT }] }],
-  },
-};
+function onDeviceParams(withImages) {
+  return {
+    createOptions: {
+      expectedInputs: withImages
+        ? [{ type: "text", languages: ["en"] }, { type: "image" }]
+        : [{ type: "text", languages: ["en"] }],
+      expectedOutputs: [{ type: "text", languages: ["en"] }],
+      initialPrompts: [{ role: "system", content: [{ type: "text", value: ON_DEVICE_PROMPT }] }],
+    },
+  };
+}
 
 const inCloudParams = {
   model: "gemini-3.5-flash-lite",
@@ -88,20 +102,19 @@ const inCloudParams = {
 };
 
 // One model per routing strategy. The SDK still falls back automatically inside each.
-export const models = {
-  [InferenceMode.PREFER_ON_DEVICE]: getGenerativeModel(ai, {
-    mode: InferenceMode.PREFER_ON_DEVICE, onDeviceParams, inCloudParams,
-  }),
-  [InferenceMode.PREFER_IN_CLOUD]: getGenerativeModel(ai, {
-    mode: InferenceMode.PREFER_IN_CLOUD, onDeviceParams, inCloudParams,
-  }),
-  [InferenceMode.ONLY_ON_DEVICE]: getGenerativeModel(ai, {
-    mode: InferenceMode.ONLY_ON_DEVICE, onDeviceParams,
-  }),
-  [InferenceMode.ONLY_IN_CLOUD]: getGenerativeModel(ai, {
-    mode: InferenceMode.ONLY_IN_CLOUD, inCloudParams,
-  }),
-};
+function makeModels(withImages) {
+  const device = onDeviceParams(withImages);
+  return {
+    [InferenceMode.PREFER_ON_DEVICE]: getGenerativeModel(ai, { mode: InferenceMode.PREFER_ON_DEVICE, onDeviceParams: device, inCloudParams }),
+    [InferenceMode.PREFER_IN_CLOUD]: getGenerativeModel(ai, { mode: InferenceMode.PREFER_IN_CLOUD, onDeviceParams: device, inCloudParams }),
+    [InferenceMode.ONLY_ON_DEVICE]: getGenerativeModel(ai, { mode: InferenceMode.ONLY_ON_DEVICE, onDeviceParams: device }),
+    [InferenceMode.ONLY_IN_CLOUD]: getGenerativeModel(ai, { mode: InferenceMode.ONLY_IN_CLOUD, inCloudParams }),
+  };
+}
+
+// Text-only models, and models whose on-device session also accepts photos.
+export const models = makeModels(false);
+export const imageModels = makeModels(true);
 
 export { InferenceMode };
 
