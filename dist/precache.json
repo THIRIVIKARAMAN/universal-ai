@@ -1,0 +1,37 @@
+{
+ "core": [
+  "/assets/cases-rx1CGpvw.js",
+  "/assets/deblur-worker-Bw6DE3R1.js",
+  "/assets/facerestore-ZAWDJW86.js",
+  "/assets/jszip.min-DHI56sS5.js",
+  "/assets/main-DTOkVznH.css",
+  "/assets/main-Dm5PS7RY.js",
+  "/assets/modulepreload-polyfill-P2Xu9kJm.js",
+  "/assets/ort.bundle.min-DG4nIOiC.js",
+  "/assets/ort.webgpu.bundle.min-PAZbwihd.js",
+  "/assets/pdf.worker.min-UqOn5EDC.js",
+  "/assets/preload-helper-7y9sWmk5.js",
+  "/assets/rolldown-runtime-COiEfhsA.js",
+  "/assets/segment-CqR90yGs.js",
+  "/assets/superres-DyGbhq5L.js",
+  "/assets/vision_bundle-BMGd9ocu.js",
+  "/mediapipe/vision_wasm_internal.js",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/icons/logo.svg",
+  "/icons/maskable-512.png",
+  "/ort/ort-wasm-simd-threaded.asyncify.mjs",
+  "/ort/ort-wasm-simd-threaded.mjs"
+ ],
+ "heavy": [
+  "/assets/matting-Bel2uSAS.js",
+  "/assets/pdf-YwugTw7Y.js",
+  "/assets/pdf.worker.min-CIqJB0yW.mjs",
+  "/mediapipe/vision_wasm_internal.wasm",
+  "/ort/ort-wasm-simd-threaded.asyncify.wasm",
+  "/ort/ort-wasm-simd-threaded.wasm",
+  "/models/realesr-general-x4v3-dn05.onnx",
+  "https://storage.googleapis.com/mediapipe-models/image_segmenter/deeplab_v3/float32/1/deeplab_v3.tflite",
+  "https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite"
+ ]
+}

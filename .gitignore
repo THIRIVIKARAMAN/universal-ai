@@ -7,3 +7,9 @@ fix.bat
 start.bat
 publish.bat
 deploy.bat
+# Old test models (not used by the app)
+public/models/realesr-general-x4v3.onnx
+dist/models/realesr-general-x4v3.onnx
+dist/models/realesr-x4v3-s*.onnx
+dist/assets/*asyncify*
+dist/assets/*jsep*

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Universal AI — photo test lab</title>
+    <link rel="icon" href="/icons/icon-192.png" />
+    <style>
+      body { margin: 0; font: 15px/1.45 system-ui, "Segoe UI", sans-serif; background: #f3f5fa; color: #131c33; }
+      header { padding: 16px 22px; background: #fff; border-bottom: 1px solid #dde2ec; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+      h1 { font-size: 20px; margin: 0; }
+      button { font: inherit; font-weight: 700; padding: 8px 16px; border-radius: 10px; border: 0; background: #3563e0; color: #fff; cursor: pointer; }
+      button:disabled { opacity: .5; }
+      #status { color: #55607a; }
+      main { padding: 18px 22px 60px; }
+      table { border-collapse: collapse; background: #fff; margin-bottom: 22px; }
+      th, td { border: 1px solid #dde2ec; padding: 5px 9px; text-align: left; font-size: 13.5px; }
+      .pass { color: #0b8f68; font-weight: 700; } .fail { color: #c2392b; font-weight: 700; } .warn { color: #a87500; font-weight: 700; }
+      .case { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) 260px; gap: 8px; background: #fff; border: 1px solid #dde2ec; border-radius: 14px; padding: 10px; margin-bottom: 12px; }
+      .case canvas, .case img { width: 100%; height: 220px; object-fit: contain; border-radius: 8px; display: block; }
+      .checker { background: repeating-conic-gradient(#d8d8d8 0 25%, #fff 0 50%) 0 0 / 16px 16px; border-radius: 8px; }
+      .case figcaption { font-size: 12px; color: #55607a; margin-top: 2px; }
+      .case figure { margin: 0; }
+      .meta { font-size: 13px; }
+      .meta b { display: block; font-size: 14px; margin-bottom: 4px; }
+      .meta a { color: #3563e0; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Photo test lab: sharpening and upscaling</h1>
+      <button id="run">Run all tests</button>
+      
+      <span id="status">21 photos. Each one is shrunk (2x, 4x) or blurred and compressed, then repaired, and the repair is compared with the original.</span>
+    </header>
+    <main>
+      <h2>Summary</h2>
+      <div id="summary">Not run yet.</div>
+      <h2>Results</h2>
+      <div id="cases"></div>
+    </main>
+    <script type="module" src="/src/lab-enhance.js"></script>
+  </body>
+</html>

@@ -1,5 +1,5 @@
 // Universal AI service worker: lets the app open with no internet.
-const VERSION = "universal-ai-v3";
+const VERSION = "universal-ai-v10";
 const SHELL = ["/", "/index.html", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png"];
 const FONT_CSS = "https://fonts.googleapis.com/css2?family=Anek+Latin:wdth,wght@75..125,400..800&family=Mukta:wght@400;500;700&display=swap";
 
@@ -7,12 +7,17 @@ self.addEventListener("install", (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(VERSION);
     await cache.addAll(SHELL);
-    // Cache the built JS/CSS that index.html points to.
+    // Cache every small app file (including tools that load later, like the photo and PDF readers).
     try {
-      const html = await (await fetch("/index.html", { cache: "no-store" })).text();
-      const assets = [...html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)].map((m) => m[1]);
-      await cache.addAll(assets);
-    } catch {}
+      const list = await (await fetch("/precache.json", { cache: "no-store" })).json();
+      await cache.addAll(list.core);
+    } catch {
+      // Older builds without precache.json: at least cache what index.html points to.
+      try {
+        const html = await (await fetch("/index.html", { cache: "no-store" })).text();
+        await cache.addAll([...html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)].map((m) => m[1]));
+      } catch {}
+    }
     // Cache the fonts so the app looks the same offline.
     try {
       const cssRes = await fetch(FONT_CSS);
@@ -30,6 +35,27 @@ self.addEventListener("activate", (event) => {
     for (const key of await caches.keys()) if (key !== VERSION) await caches.delete(key);
     await self.clients.claim();
   })());
+  // Then quietly fetch the big engines (photo background remover, PDF reader) for offline use.
+  cacheHeavyFiles();
+});
+
+async function cacheHeavyFiles() {
+  try {
+    const cache = await caches.open(VERSION);
+    const list = await (await fetch("/precache.json", { cache: "no-store" })).json();
+    for (const url of list.heavy) {
+      if (await cache.match(url)) continue;
+      try {
+        const res = await fetch(url, { mode: url.startsWith("/") ? "same-origin" : "cors" });
+        if (res.ok) await cache.put(url, res);
+      } catch {}
+    }
+  } catch {}
+}
+
+// The page can ask for this again (for example when it comes back online).
+self.addEventListener("message", (event) => {
+  if (event.data === "cache-heavy") event.waitUntil(cacheHeavyFiles());
 });
 
 self.addEventListener("fetch", (event) => {
@@ -38,7 +64,8 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(req.url);
   const sameOrigin = url.origin === self.location.origin;
   const isFont = url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com";
-  if (!sameOrigin && !isFont) return; // AI, App Check and maps go straight to the network.
+  const isModel = url.hostname === "storage.googleapis.com" && url.pathname.startsWith("/mediapipe-models/");
+  if (!sameOrigin && !isFont && !isModel) return; // AI, App Check and maps go straight to the network.
 
   // Pages: try the network for the latest version, fall back to the saved copy.
   if (req.mode === "navigate") {

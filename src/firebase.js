@@ -1,7 +1,7 @@
 // Firebase setup: app, App Check, and Firebase AI Logic (hybrid inference).
 import { initializeApp } from "firebase/app";
 import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "firebase/app-check";
-import { getAI, getGenerativeModel, GoogleAIBackend, InferenceMode } from "firebase/ai";
+import { getAI, getGenerativeModel, GoogleAIBackend, InferenceMode, ResponseModality } from "firebase/ai";
 
 // Your web app's Firebase configuration (safe to be public; App Check protects the API).
 const firebaseConfig = {
@@ -118,9 +118,36 @@ export const imageModels = makeModels(true);
 
 export { InferenceMode };
 
+// Cloud photo editing with Gemini image models ("Nano Banana"). Needs internet.
+const IMAGE_EDIT_MODELS = ["gemini-3.1-flash-lite-image", "gemini-3.1-flash-image"];
+export async function editImageInCloud(base64Jpeg, instruction) {
+  let lastError;
+  for (const model of IMAGE_EDIT_MODELS) {
+    try {
+      const m = getGenerativeModel(ai, {
+        model,
+        generationConfig: { responseModalities: [ResponseModality.TEXT, ResponseModality.IMAGE] },
+      });
+      const result = await m.generateContent([
+        { text: `Edit this photo: ${instruction}. Keep everything else the same. Return the edited photo.` },
+        { inlineData: { mimeType: "image/jpeg", data: base64Jpeg } },
+      ]);
+      const img = result.response.inlineDataParts()?.[0]?.inlineData;
+      if (img) return { mimeType: img.mimeType, data: img.data, note: result.response.text?.() || "" };
+      lastError = new Error(result.response.text?.() || "The model didn't return a photo.");
+    } catch (e) {
+      lastError = e;
+    }
+  }
+  throw lastError;
+}
+
 // Developer helper: in the browser console run  await universalTestModel("gemini-3.5-flash")
 self.universalTestModel = async (name) => {
   const m = getGenerativeModel(ai, { mode: InferenceMode.ONLY_IN_CLOUD, inCloudParams: { model: name } });
   try { const r = await m.generateContent("Say OK"); return `${name}: ${r.response.text()}`; }
   catch (e) { return `${name}: ${e.message}`; }
 };
+
+// Developer helper for testing the photo editor from the browser console.
+self.universalEditTest = editImageInCloud;
